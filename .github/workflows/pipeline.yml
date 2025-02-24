@@ -18,9 +18,12 @@ jobs:
 
       - name: Check style
         run: npm run eslint
-        
+
       - name: Build
         run: npm run build
 
       - name: Run tests
         run: npm run test
+      
+      - name: Deploy
+        run: curl https://api.render.com/deploy/${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}

@@ -13,7 +13,7 @@ env:
   SKIP_DEPLOY: ${{ github.event_name == 'push' && !contains(join(github.event.commits.*.message), '#skip') }}
 
 jobs:
-  simple_deployment_pipeline:
+  simple_pipeline:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
@@ -26,15 +26,55 @@ jobs:
       - name: Check style
         run: npm run eslint
 
+  build_test_pipeline:
+    needs: [simple_pipeline]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
       - name: Build
         run: npm run build
+      
+      - name: Build Success
+        uses: rjstone/discord-webhook-notify@v1
+        if: success()
+        with:
+            severity: info
+            details: Build succeeded!
+            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Build Failure
+        uses: rjstone/discord-webhook-notify@v1
+        if: failure()
+        with:
+            severity: error
+            details: Build failed!
+            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Run tests
         run: npm run test
       
+  simple_deployment_pipeline:
+    needs: [build_test_pipeline]
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
       - name: Deploy
         if: ${{ github.env.SKIP_DEPLOY == 'true' }}
         run: curl https://api.render.com/deploy/${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
+        
+      - name: Deploy Success
+        uses: rjstone/discord-webhook-notify@v1
+        if: success()
+        with:
+            severity: info
+            details: Deploy succeeded!
+            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
   
   tag_release:
     needs: [simple_deployment_pipeline]

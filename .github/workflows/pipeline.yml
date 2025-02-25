@@ -34,14 +34,14 @@ jobs:
         run: |
           curl -X POST -H "Content-Type: application/json" \
           -d '{"content": "Build succeeded! Version deployed."}' \
-          ${{ secrets.DISCORD_WEBHOOK_URL }}
+          ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Build Failure
         if: failure()
         run: |
           curl -X POST -H "Content-Type: application/json" \
           -d '{"content": "Build failed! Version deployed."}' \
-          ${{ secrets.DISCORD_WEBHOOK_URL }}
+          ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Run tests
         run: npm run test
@@ -63,7 +63,7 @@ jobs:
         run: |
           curl -X POST -H "Content-Type: application/json" \
           -d '{"content": "Build succeeded! Version deployed."}' \
-          ${{ secrets.DISCORD_WEBHOOK_URL }}
+          ${{ secrets.DISCORD_WEBHOOK }}
   
   tag_release:
     needs: [simple_deployment_pipeline]

@@ -30,18 +30,20 @@ jobs:
         run: npm run build
       
       - name: Build Success
+      - uses: sarisia/actions-status-discord@v1
         if: success()
-        run: |
-          curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Build succeeded! Version deployed."}' \
-          ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          title: "build"
 
       - name: Build Failure
+      - uses: sarisia/actions-status-discord@v1
         if: failure()
-        run: |
-          curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Build failed! Version deployed."}' \
-          ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          title: "build"
 
       - name: Run tests
         run: npm run test
@@ -59,11 +61,12 @@ jobs:
         run: curl https://api.render.com/deploy/${{ secrets.RENDER_SERVICE_ID }}?key=${{ secrets.RENDER_API_KEY }}
         
       - name: Deploy Success
+      - uses: sarisia/actions-status-discord@v1
         if: success()
-        run: |
-          curl -X POST -H "Content-Type: application/json" \
-          -d '{"content": "Build succeeded! Version deployed."}' \
-          ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          webhook: ${{ secrets.DISCORD_WEBHOOK }}
+          status: ${{ job.status }}
+          title: "build"
   
   tag_release:
     needs: [simple_deployment_pipeline]

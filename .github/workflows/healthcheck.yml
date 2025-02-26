@@ -2,7 +2,7 @@ name: Health check
 
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: '0 0 1 1 *'
 
 env:
   URL: https://full-stack-open-pokedex-1uhs.onrender.com
